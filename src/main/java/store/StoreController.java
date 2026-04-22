@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 @RequestMapping("/**")
 public class StoreController {
 
-    private final Path rootLocation = Paths.get("upload-dir").toAbsolutePath().normalize();
+    private final Path rootLocation = Paths.get("loaded_data").toAbsolutePath().normalize();
 
     public StoreController() throws IOException {
         Files.createDirectories(rootLocation);
