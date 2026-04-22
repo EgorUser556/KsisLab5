@@ -1,6 +1,7 @@
 package store;
 
 import jakarta.servlet.http.HttpServletRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -23,8 +24,10 @@ import java.util.stream.Stream;
 public class StoreController {
 
     private final Path rootLocation = Paths.get("loaded_data").toAbsolutePath().normalize();
+    private final ObjectMapper objectMapper;
 
-    public StoreController() throws IOException {
+    public StoreController(ObjectMapper objectMapper) throws IOException {
+        this.objectMapper = objectMapper;
         Files.createDirectories(rootLocation);
     }
 
@@ -95,8 +98,11 @@ public class StoreController {
         }
 
         if (Files.isDirectory(path)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("HEAD is only supported for files");
+            byte[] jsonBytes = objectMapper.writeValueAsBytes(readDirectory(path));
+            return ResponseEntity.ok()
+                    .contentLength(jsonBytes.length)
+                    .lastModified(Files.getLastModifiedTime(path).toMillis())
+                    .build();
         }
 
         return ResponseEntity.ok()
