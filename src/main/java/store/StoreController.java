@@ -58,6 +58,11 @@ public class StoreController {
         if (copyFrom != null && !copyFrom.isBlank()) {
             Path sourcePath = resolvePath(copyFrom);
 
+            if (sourcePath.equals(targetPath)) {
+                return ResponseEntity.badRequest()
+                        .body("Source and target must be different");
+            }
+
             if (sourceFileMissingOrDirectory(sourcePath)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body("Source file not found");
